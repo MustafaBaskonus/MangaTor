@@ -14,8 +14,10 @@ namespace MangaTor.Infrastructure.Mapper
             CreateMap<Category, CategoryWithTotalChapteDto>()
                                 .ForMember(dest => dest.TotalComic,
                                  opt => opt.MapFrom(src => src.Comics.Count));
-            CreateMap<UserDtoForInsertion, IdentityUser>();
-            CreateMap<UserDtoForUpdate, IdentityUser>().ReverseMap();
+            CreateMap<UserDtoForInsertion, ApplicationUser>();
+            CreateMap<UserDtoForUpdate, ApplicationUser>().ReverseMap();
+            CreateMap<ProfileDto, ApplicationUser>().ReverseMap();
+
             CreateMap<Comic, ComicDetailViewModel>();
 
             //reaction

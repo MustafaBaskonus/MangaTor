@@ -7,18 +7,14 @@ using System.Threading.Tasks;
 
 namespace DAL.Entities.DTOs
 {
-    public record UserDto
+    public class ProfileDto
     {
-        [DataType(DataType.Text)]
-        [Required(ErrorMessage = "UserName Is required.")]
         public string UserName { get; init; }
-        [DataType(DataType.PhoneNumber)]
-        [Required(ErrorMessage = "Phone Number Is required.")]
         public string PhoneNumber { get; init; }
-        [DataType(DataType.EmailAddress)]
-        [Required(ErrorMessage = "EMail Is required.")]
-        public string EMail { get; init; }
+        public string Email { get; init; }
+        public bool EmailConfirmed { get; init; }
         public string? ProfileImageUrl { get; set; }
         public HashSet<String> Roles { get; set; } = new HashSet<string>();
+        public List< ComicRating>? comicRating { get; set; }
     }
 }

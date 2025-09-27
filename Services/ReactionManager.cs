@@ -17,10 +17,10 @@ namespace Services
     public class ReactionManager : IReactionService
     {
         private readonly AppDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
-        public ReactionManager(AppDbContext context, IMapper mapper, UserManager<IdentityUser> userManager)
+        public ReactionManager(AppDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _mapper = mapper;

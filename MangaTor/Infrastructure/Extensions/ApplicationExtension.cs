@@ -1,4 +1,5 @@
 ﻿using DAL.Context;
+using DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,11 +37,11 @@ namespace MangaTor.Infrastructure.Extensions
             const string adminPassword = "Mustafa+123456";
 
             // UserManager
-            UserManager<IdentityUser> userManager = app
+            UserManager<ApplicationUser> userManager = app
                 .ApplicationServices
                 .CreateScope()
                 .ServiceProvider
-                .GetRequiredService<UserManager<IdentityUser>>();
+                .GetRequiredService<UserManager<ApplicationUser>>();
 
             // RoleManager
             RoleManager<IdentityRole> roleManager = app
@@ -49,10 +50,10 @@ namespace MangaTor.Infrastructure.Extensions
                 .ServiceProvider
                 .GetRequiredService<RoleManager<IdentityRole>>();
 
-            IdentityUser user = await userManager.FindByNameAsync(adminUser);
+            ApplicationUser user = await userManager.FindByNameAsync(adminUser);
             if (user is null)
             {
-                user = new IdentityUser()
+                user = new ApplicationUser()
                 {
                     Email = "bskns.mustafa@gmail.com",
                     PhoneNumber = "5051170089",

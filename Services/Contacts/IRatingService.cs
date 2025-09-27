@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DAL.Entities;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace Services.Contacts
         double GetComicAverageScore(int ComicId);
         //comic details
         Task<int> GetScoreByUser(int ComicId, HttpContext httpContext);
+        //profile
+        Task<List<ComicRating>> AllRateForUserId(string UserId);
 
 
     }

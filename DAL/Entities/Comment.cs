@@ -18,7 +18,7 @@ namespace DAL.Entities
 
         // Kullanıcı ilişkisi
         public string UserId { get; set; }
-        public IdentityUser User { get; set; }
+        public ApplicationUser User { get; set; }
 
         // Comic ilişkisi 
         public int? ComicId { get; set; }

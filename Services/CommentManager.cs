@@ -19,9 +19,9 @@ namespace Services
     public class CommentManager: ICommentService
     {
         private readonly AppDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
-        public CommentManager(AppDbContext appDbContext, UserManager<IdentityUser> userManager, IMapper mapper)
+        public CommentManager(AppDbContext appDbContext, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _context = appDbContext;
             _userManager = userManager;

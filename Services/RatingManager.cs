@@ -2,6 +2,7 @@
 using DAL.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Services.Contacts;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,9 @@ namespace Services
     public class RatingManager : IRatingService
     {
         private readonly AppDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public RatingManager(AppDbContext context, UserManager<IdentityUser> userManager)
+        public RatingManager(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -62,6 +63,13 @@ namespace Services
                                  .FirstOrDefault(m => m.UserId == user.Id && m.ComicId == ComicId);
 
             return rating?.Score ?? 0; // rating yoksa 0 döndür
+        }
+
+
+        public async Task<List<ComicRating>> AllRateForUserId(string UserId)
+        {
+            var comicRate =await _context.ComicRatings.Include(m=>m.Comic).Where(m => m.UserId == UserId).OrderByDescending(m=>m.Score).ToListAsync();
+            return comicRate;
         }
     }
 }

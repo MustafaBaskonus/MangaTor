@@ -1,4 +1,5 @@
-﻿using DAL.Entities.DTOs;
+﻿using DAL.Entities;
+using DAL.Entities.DTOs;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Services.Contacts
         IEnumerable<IdentityRole> GetRoles();
         //Index
         Task<IEnumerable<UserDtoForUpdate>> GetUsersDtoAsymc();
-        Task<IdentityUser> GetOneUserAsync(string Name);
+        Task<ApplicationUser> GetOneUserAsync(string Name);
         Task<UserDtoForUpdate> GetOneUserForUpdateAsync(string Name);
 
         Task<IdentityResult> CreateUserAsync(UserDtoForInsertion userDtoForInsertion);

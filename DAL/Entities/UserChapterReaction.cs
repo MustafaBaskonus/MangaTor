@@ -17,7 +17,7 @@ namespace DAL.Entities
         public ReactionType ReactionType { get; set; }
 
         public string UserId { get; set; }
-        public IdentityUser User { get; set; }
+        public ApplicationUser User { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

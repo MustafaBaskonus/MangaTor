@@ -21,9 +21,9 @@ namespace Services
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ComicManager(AppDbContext context, IMapper mapper, UserManager<IdentityUser> usermanager)
+        public ComicManager(AppDbContext context, IMapper mapper, UserManager<ApplicationUser> usermanager)
         {
             _context = context;
             _mapper = mapper;

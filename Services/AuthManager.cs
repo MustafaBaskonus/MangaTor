@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DAL.Entities;
 using DAL.Entities.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Services.Contacts;
@@ -13,10 +14,10 @@ namespace Services
     public class AuthManager : IAuthService
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
-        public AuthManager(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager, IMapper mapper)
+        public AuthManager(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -25,7 +26,7 @@ namespace Services
 
         public async Task<IdentityResult> CreateUserAsync(UserDtoForInsertion userDtoForInsertion)
         {
-            var user = _mapper.Map<IdentityUser>(userDtoForInsertion);
+            var user = _mapper.Map<ApplicationUser>(userDtoForInsertion);
             var result = await _userManager.CreateAsync(user, userDtoForInsertion.Password);
             if (!result.Succeeded)
             {
@@ -49,7 +50,7 @@ namespace Services
             await _userManager.DeleteAsync(user);
         }
 
-        public async Task<IdentityUser> GetOneUserAsync(string Name)
+        public async Task<ApplicationUser> GetOneUserAsync(string Name)
         {
             var user = await _userManager.FindByNameAsync(Name);
             if (user is not null)

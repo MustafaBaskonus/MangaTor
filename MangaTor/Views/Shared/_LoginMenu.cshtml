@@ -11,6 +11,11 @@
 @if (User.Identity.IsAuthenticated)
 {
     <li>
+        <a asp-area="" asp-controller="MyProfile" asp-action="Index">
+            <i class="mdi mdi-owl">My Profile</i>
+        </a>
+    </li>
+    <li>
         <a asp-area="" asp-controller="Account" asp-action="Logout" asp-route-returnUrl="@Context.Request.PathAndQuery()">
             <span class="text-danger"><i class="mdi mdi-logout">Logout</i></span>
         </a>

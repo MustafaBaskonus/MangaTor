@@ -1,4 +1,5 @@
-﻿using DAL.Entities.DTOs;
+﻿using DAL.Entities;
+using DAL.Entities.DTOs;
 using MangaTor.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,11 +8,11 @@ namespace MangaTor.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-                                SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager,
+                                SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -31,7 +32,7 @@ namespace MangaTor.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser user = await _userManager.FindByNameAsync(model.Name);
+                ApplicationUser user = await _userManager.FindByNameAsync(model.Name);
                 if (user is not null)
                 {
                     await _signInManager.SignOutAsync();
@@ -58,7 +59,7 @@ namespace MangaTor.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register([FromForm] RegisterDto registerDto)
         {
-            var user = new IdentityUser { UserName = registerDto.UserName, Email = registerDto.EMail };
+            var user = new ApplicationUser { UserName = registerDto.UserName, Email = registerDto.EMail };
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (result.Succeeded)
             {
