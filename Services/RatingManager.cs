@@ -50,7 +50,7 @@ namespace Services
             if (!scores.Any()) return averageScore; // Hiç puan yoksa 0 döndür
 
             averageScore = scores.Average();
-            return averageScore;
+            return Math.Round(averageScore, 1);
         }
 
         public async Task<int> GetScoreByUser(int ComicId, HttpContext httpContext)
