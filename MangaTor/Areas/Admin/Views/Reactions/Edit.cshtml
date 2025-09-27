@@ -1,0 +1,42 @@
+﻿@model ReactionType
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<div class="container mt-4">
+    <h1>Yeni Reaction Ekle</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post">
+                <input type="hidden" asp-for="@Model.Id"/>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Icon" class="control-label"></label>
+                    <input asp-for="Icon" class="form-control" />
+                    <span asp-validation-for="Icon" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="SequenceNumber" class="control-label"></label>
+                    <input type="number" asp-for="SequenceNumber" class="form-control" />
+                    <span asp-validation-for="SequenceNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3 form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Güncelle" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

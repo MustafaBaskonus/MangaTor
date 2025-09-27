@@ -1,0 +1,29 @@
+﻿
+<header class="header-area header-sticky">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <nav class="main-nav">
+                    <!-- ***** Logo Start ***** -->
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="logo">
+                        <img src="~/template_cyborg/assets/images/logo.png" alt="">
+                    </a>
+                    <!-- ***** Search End ***** -->
+                    <div class="search-input">
+                        <form id="search" method="get" asp-area="" asp-controller="Comics" asp-action="Index">
+                            <input type="text" placeholder="Search Comics" id='searchText' name="SearchTerm" onkeypress="handle" />
+                            <i class="fa fa-search"></i>
+                        </form>
+                    </div>
+                    <!-- ***** Menu Start ***** -->
+                    <ul class="nav">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Index" class="active">Home</a></li>
+                        <li><a asp-area="" asp-controller="Comics" asp-action="Index">Comics</a></li>
+
+                        <partial name="_LoginMenu" />
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,32 @@
+﻿@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
+    <li>
+        <a asp-area="Admin" asp-controller="Comics" asp-action="Index">
+            <i class="mdi mdi-owl">Admin</i>
+        </a>
+    </li>
+}
+
+
+@if (User.Identity.IsAuthenticated)
+{
+    <li>
+        <a asp-area="" asp-controller="Account" asp-action="Logout" asp-route-returnUrl="@Context.Request.PathAndQuery()">
+            <span class="text-danger"><i class="mdi mdi-logout">Logout</i></span>
+        </a>
+    </li>
+}
+else
+{
+    <li>
+        <a asp-area="" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.PathAndQuery()">
+            <span class="text-success"><i class="mdi mdi-login">Login</i></span>
+        </a>
+    </li>
+    <li>
+        <a asp-area="" asp-controller="Account" asp-action="Register" asp-route-returnUrl="@Context.Request.PathAndQuery()">
+            <span class="text-info"><i class="mdi mdi-register">Register</i></span>
+        </a>
+    </li>
+
+}

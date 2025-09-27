@@ -1,0 +1,102 @@
+﻿@model CommentListViewModel
+<style>
+    .comment-text {
+        white-space: normal; /* metin satır sonuna göre kayar */
+        word-wrap: break-word; /* kelimeler çok uzunsa kırar */
+        overflow-wrap: break-word; /* modern tarayıcılar için */
+        max-width: 100%; /* tablo genişliği kadar */
+    }
+</style>
+
+<div class="col-lg-12 grid-margin stretch-card">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Comments</h4>
+            <p class="card-description">
+               Comments for comics and chapters.
+            </p>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th> User </th>
+                            <th> First name </th>
+                            <th> Kime Yazmış</th>
+                            <th> Comic </th>
+                            <th> Chapter </th>
+                            <th> CreatedAt </th>
+                            <th> Content </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var com in Model.Comments)
+                        {
+                            var collapseId = $"collapse_{com.Id}";
+
+                            <tr>
+                                <td>@com.Id</td>
+                                @*<td class="py-1">
+                            <img src="../../assets/images/faces-clipart/pic-1.png" alt="@com.User.UserName" />
+                            </td>*@
+                                <td>@com.UserName</td>
+                                <td>@com.CommentUserName</td>
+                                <td>@(com.ComicTitle ?? "----")</td>
+                                <td>@(com.ChapterTitle ?? "----")</td>
+                                <td>@com.CreatedAt</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" type="button"
+                                            data-toggle="collapse" data-target="#@collapseId"
+                                            aria-expanded="false" aria-controls="@collapseId">
+                                        Mesajı Gör
+                                    </button>
+                                </td>
+                                <td>
+                                    <a asp-area="Admin"
+                                       asp-controller="Comments" asp-action="Delete" asp-route-id="@com.Id" class="btn btn-danger btn-sm">
+                                        <i class="mdi mdi-delete-forever"></i> Sil
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr class="collapse  " id="@collapseId">
+                                @if(com.Replies is not null)
+                                {
+                                    <td>
+                                    @foreach(var rep in com.Replies){
+                                        <td colspan="5" class="bg-dark">
+                                        <div class="comment-text">
+                                                <strong>Ana Yorum - @rep.UserName:</strong> @rep.Content
+                                        </div>
+                                        </td>
+                                    }
+                                    </td>
+                                    
+                                }
+                                <td colspan="5" class="bg-dark">
+                                    <div class="comment-text">
+                                        <strong>Mesaj:</strong> @com.Content
+                                    </div>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-center mt-4">
+                    @if (Model?.Pagination != null)
+                    {
+                        <div class="btn-group">
+                            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                            {
+                                <a asp-action="Index" asp-route-PageNumber="@i"
+                                   class="btn @(i == Model.Pagination.CurrentPage ? "btn-secondary" : "btn-outline-dark")">
+                                    @i
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

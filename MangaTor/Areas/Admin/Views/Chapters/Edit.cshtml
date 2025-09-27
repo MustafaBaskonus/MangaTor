@@ -1,0 +1,49 @@
+﻿@model Chapter
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+
+
+<div class="container mt-4">
+    <h1>Bölüm Güncelle</h1>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <input type="hidden" asp-for="ComicId"  />
+                <input type="hidden" asp-for="ChapterId"  />
+                <input type="hidden" asp-for="TotalPage"  />
+
+                <div class="form-group mb-3">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="ChapterNo" class="control-label"></label>
+                    <input asp-for="ChapterNo" class="form-control" />
+                    <span asp-validation-for="ChapterNo" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="ReleaseDate" class="control-label"></label>
+                    <input asp-for="ReleaseDate" class="form-control" />
+                    <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3 form-check">
+                    <input asp-for="IsActive" class="form-check-input" />
+                    <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Güncelle" class="btn btn-primary" />
+                    <a asp-area="Admin" asp-controller="Comics" asp-action="Details" asp-route-comicSlug="@Model.Comic.Slug" class="btn btn-secondary">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,70 @@
+﻿@model List<ReactionType>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@{
+    int counter = 1;
+}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Reactions Type</h4>
+                    <p class="card-description">
+                    </p>
+                    <div class="d-flex justify-content-end">
+                        <a asp-area="Admin" asp-controller="Reactions" asp-action="Create" class="btn btn-outline-success">
+                            <i class="mdi mdi-account-plus"></i>
+                            Add Reactions
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+
+
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sıra</th>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>İcon</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var reaction in Model.OrderBy(m=>m.SequenceNumber))
+                                {
+                                    <tr>
+                                        <td>@reaction.SequenceNumber</td>
+                                        <td><i class="@reaction.Icon"></i></td>
+                                        <td>@reaction.Name</td>
+                                        <td>@reaction.Icon</td>
+                                        <td>@reaction.IsActive</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a data-toggle="tooltip" data-placement="top" title="Edit"
+                                                   class="btn btn-inverse-success  btn-md" asp-action="Edit" asp-route-id="@reaction.Id">
+                                                    <i class="mdi mdi-pencil">Edit</i>
+                                                </a>
+                                                <a data-toggle="tooltip" data-placement="top" title="Edit"
+                                                   class="btn btn-inverse-danger  btn-md" asp-action="Delete" asp-route-id="@reaction.Id">
+                                                    <i class="mdi mdi-account-remove">Sil</i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

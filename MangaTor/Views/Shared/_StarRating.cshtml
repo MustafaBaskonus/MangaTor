@@ -1,0 +1,264 @@
+﻿@model double
+@{
+    var comicId = ViewData["ComicIdParam"] as int? ?? 0; 
+    var userRating = ViewData["UserScore"] as int? ?? 0;
+}
+
+@*
+<div class="wrap">
+    <div class="stars">
+        @for (int i = 1; i <= 5; i++)
+        {
+            var activeClass = i <= Model ? "fas rate-active" : "far";
+            <label class="rate" data-value="@i" data-comic="@comicId">
+                <input type="radio" name="rating" value="@i">
+                <div class="face"></div>
+                <i class="@activeClass fa-star star"></i>
+            </label>
+        }
+    </div>
+</div>*@
+<style>
+
+    /* Ortalama puan ve yıldızları içeren ana sarmalayıcı. Satırın sağına yaslar. */
+    .rating-container {
+        display: flex; /* İçindeki elemanları (puan ve yıldızlar) yan yana dizer */
+        align-items: center; /* Öğeleri dikeyde hizalar */
+        float: right; /* Bulunduğu satırın sağına yaslar */
+        margin-right: 2px;
+        margin-top: 5px;
+
+    /* Ortalama puanı göstereceğiniz alanın stili (Yıldızların hemen solu) */
+    .avg-score {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #d3dcff; /* Okunabilir bir renk */
+        margin-right: 2px; 
+        margin-top: 5px;
+    }
+
+    /* --- MEVCUT STILLERIN DÜZENLENMESİ --- */
+
+    .rate-active {
+        color: #FFC300 !important;
+    }
+
+    /* Yıldızlar üzerine gelindiğinde (hover) veya seçiliyken tam dolu görünmesini sağlar */
+    .rate:hover .star,
+    .rate:has(input:checked) .star {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        content: "\f005"; /* Tam dolu yıldız */
+    }
+
+    /* Fare, bir yıldızın üzerine geldiğinde ondan sonraki yıldızların varsayılan stilini korur */
+    .rate:has(~ .rate:hover) .star {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 400; /* Boş yıldız */
+        content: "\f006"; /* Boş yıldız simgesi */
+    }
+
+    /* .wrap stili yeniden düzenlendi. position ve transform kaldırıldı. */
+    .wrap {
+        width: 250px;
+        height: 50px;
+        /* background: #fff; Eğer ihtiyacınız yoksa kaldırabilirsiniz */
+        border-radius: 10px;
+        /* absolute konumlandırma kaldırıldığı için bu satırlar kaldırıldı */
+        position: static;
+        top: auto;
+        left: auto;
+        transform: none;
+    }
+
+    .stars {
+        width: fit-content;
+        margin: 0 auto;
+        cursor: pointer;
+        color: #FFC300;
+    }
+
+    .star {
+        color: FFC300 !important;
+    }
+
+    .rate {
+        height: 50px;
+        margin-left: -5px;
+        padding: 5px;
+        font-size: 25px;
+        position: relative;
+        cursor: pointer;
+        display: inline-block; /* Yan yana gelmeleri için */
+    }
+
+        .rate input[type="radio"] {
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%; /* Orta noktaya geri alındı */
+            transform: translate(-50%,0%);
+            pointer-events: none;
+        }
+
+    /* ... (Yüz ifadeleri ve diğer stilleriniz burada devam ediyor) ... */
+    .star-over::after {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        font-size: 16px;
+        content: "\f005";
+        display: inline-block;
+        color: #d3dcff;
+        z-index: 1;
+        position: absolute;
+        top: 17px;
+        left: 10px;
+    }
+
+    .rate:nth-child(1) .face::after {
+        content: "\f119"; /* ☹ */
+    }
+
+    .rate:nth-child(2) .face::after {
+        content: "\f11a"; /* 😐 */
+    }
+
+    .rate:nth-child(3) .face::after {
+        content: "\f118"; /* 🙂 */
+    }
+
+    .rate:nth-child(4) .face::after {
+        content: "\f580"; /* 😊 */
+    }
+
+    .rate:nth-child(5) .face::after {
+        content: "\f59a"; /* 😄 */
+    }
+
+    .face {
+        opacity: 0;
+        position: absolute;
+        width: 35px;
+        height: 35px;
+        background: #91a6ff;
+        border-radius: 5px;
+        top: -50px;
+        left: 2px;
+        transition: 0.2s;
+        pointer-events: none;
+    }
+
+        .face::before {
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            content: "\f0dd";
+            display: inline-block;
+            color: #91a6ff;
+            z-index: 1;
+            position: absolute;
+            left: 9px;
+            bottom: -15px;
+        }
+
+        .face::after {
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            display: inline-block;
+            color: #fff;
+            z-index: 1;
+            position: absolute;
+            left: 5px;
+            top: -1px;
+        }
+
+    .rate:hover .face {
+        opacity: 1;
+    }
+
+</style>
+
+
+<div class="rating-container">
+    <span class="avg-score">@Model</span> 
+
+    <div class="wrap" data-comic-id="@comicId">
+        <div class="stars">
+            @for (int i = 1; i <= 5; i++)
+            {
+                var isChecked = (i <= Model) ? "checked" : "";
+                <label class="rate" data-value="@i">
+                    <input type="radio" name="rating" id="star@(i)" value="@i" @isChecked />
+                    <div class="face"></div>
+                    <i class="@((i <= userRating ) ? "fas rate-active" : "far") fa-star star"></i>
+                </label>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    // Tüm POST Ajax isteklerine CSRF token'ı ekler
+    $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+        if (options.type.toUpperCase() === 'POST') {
+            var token = $('input:hidden[name="__RequestVerificationToken"]').val();
+            options.data = $.param($.extend(originalOptions.data, {
+                __RequestVerificationToken: token
+            }));
+        }
+    });
+    // Component'in HTML'i ile birlikte yüklenir
+    $(function () {
+        // 1. Hover (Üzerine Gelme) Efekti
+        $(document).on({
+            mouseover: function () {
+                // Sadece hover edilen ve öncekileri doldur
+                $(this).find('.star').addClass('star-over');
+                $(this).prevAll('.rate').find('.star').addClass('star-over');
+
+                // Seçili yıldızdan sonrakilerin hover'ını kaldır (çakışmayı önler)
+                $(this).nextAll('.rate').find('.star').removeClass('star-over');
+            },
+            mouseleave: function () {
+                $(this).find('.star').removeClass('star-over');
+                $(this).prevAll('.rate').find('.star').removeClass('star-over');
+            }
+        }, '.rate');
+
+        // 2. Click (Tıklama) ve Ajax İşlemi
+        $(document).on('click', '.rate', function () {
+            var $this = $(this);
+            var ratingValue = $this.data('value'); // Tıklanan yıldızın puanı
+            var comicIdValue = $this.closest('.wrap').data('comic-id'); // Wrap'ten comicId'yi oku
+
+            $.ajax({
+                url: '/Rate/AddRate',
+                method: 'POST',
+                data: { comicId: comicIdValue, rating: ratingValue },
+                success: function (res) {
+                    if (res.success) {
+                        // Başarılı olursa, tüm yıldızları sıfırla ve yeni puana göre doldur
+                        var $stars = $this.closest('.stars');
+                        $stars.find('i').removeClass('fas rate-active').addClass('far'); // Önce tümünü boş yap
+
+                        $stars.find('.rate').each(function () {
+                            // Yeni puana eşit veya küçük olanları doldur
+                            if ($(this).data('value') <= rating) {
+                                $(this).find('i').removeClass('far').addClass('fas rate-active');
+                                $(this).find('input[type="radio"]').prop('checked', true);
+                            }
+                        });
+                        alert('Puanınız başarıyla kaydedildi!');
+                    } else {
+                        alert('Puan kaydedilirken bir hata oluştu.');
+                    }
+                },
+                error: function () {
+                    alert('Puan vermek için lütfen giriş yapın.');
+                }
+            });
+        });
+    });
+</script>

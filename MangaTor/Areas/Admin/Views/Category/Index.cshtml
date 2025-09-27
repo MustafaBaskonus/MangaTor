@@ -1,0 +1,72 @@
+﻿@model List<CategoryWithTotalChapteDto>
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Kategoriler</h4>
+                    <p class="card-description">
+                    </p>
+                    <div class="d-flex justify-content-end">
+                        <a asp-area="Admin" asp-controller="Category" asp-action="Create" class="btn btn-outline-success">
+                            <i class="mdi mdi-account-plus"></i>
+                            Kateori Oluştur
+                        </a>
+                    </div>
+                    @if (Model != null && Model.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Slug</th>
+                                    <th>Camic Sayısı</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var category in Model.OrderBy(c => c.CategoryId))
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => category.CategoryId)</td>
+                                        <td>@Html.DisplayFor(modelItem => category.Name)</td>
+                                        <td>@category.Slug</td>
+                                        <td>@category.TotalComic</td>
+                                        <td>@category.IsActive</td>
+                                        <td>
+
+                                            <a asp-area="Admin" asp-controller="Category" asp-action="Edit" asp-route-id="@category.CategoryId" class="btn btn-inverse-info btn-md text-white" title="Düzenle">
+                                                <i class="fas fa-list-alt">Düzenle</i>
+                                            </a>
+                                            <a asp-area="Admin" asp-controller="Category" asp-action="Delete" asp-route-id="@category.CategoryId" class="btn btn-inverse-danger btn-md" title="Sil">
+                                                <i class="fas fa-trash-alt">Sil</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                    }
+                    else
+                    {
+                        <div class="list-group-item text-center text-muted">
+                            Henüz bir kategori bulunmuyor.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

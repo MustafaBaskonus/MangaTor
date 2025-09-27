@@ -1,0 +1,90 @@
+﻿@model   ComicWithChaptersDto
+
+@{
+    ViewData["Title"] = $"{Model.Comic.Title} Bölümleri";
+}
+
+
+
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 mb-4 border-1 border-dark p-3 bg-light shadow">
+            <div class="card shadow-sm h-100">
+                <img src="@Model.Comic.CoverImageUrl" class="card-img-top" alt="@Model.Comic.Title Kapak Resmi" style="object-fit: cover; height: 350px;">
+                <div class="card-body">
+                    <h1 class="card-title text-center mb-3">@Model.Comic.Title</h1>
+                    <p class="card-text text-muted">@Model.Comic.Description</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Bölümler</h5>
+                    <a asp-area="Admin" asp-controller="Chapters" asp-action="Create" asp-route-comicId="@Model.Comic.ComicId" class="btn btn-light btn-sm">Yeni Bölüm Ekle</a>
+                </div>
+                <div class="list-group list-group-flush">
+                    @if (Model.Chapters != null && Model.Chapters.Any())
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Başlık</th>
+                                    <th>Sayfa Sayısı</th>
+                                    <th>Durum</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var chapter in Model.Chapters.OrderBy(c => c.ChapterNo))
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => chapter.ChapterNo)</td>
+                                        <td>@Html.DisplayFor(modelItem => chapter.Title)</td>
+                                        <td>@chapter.TotalPage</td>
+                                        <td>@chapter.IsActive</td>
+                                        <td>
+                                            <a asp-area="Admin" asp-controller="Pages" asp-action="Create" asp-route-chapterId="@chapter.ChapterId" class="btn btn-success btn-sm" title="Sayfa Yükle">
+                                                <i class="fas fa-edit">Sayfa Yükle</i>
+                                            </a>
+                                            <a asp-area="Admin" asp-controller="Chapters" asp-action="Edit" asp-route-id="@chapter.ChapterId" class="btn btn-info btn-sm text-white" title="Düzenle">
+                                                <i class="fas fa-list-alt">Düzenle</i>
+                                            </a>
+                                            <a asp-area="Admin" asp-controller="Chapters" asp-action="Delete" asp-route-id="@chapter.ChapterId" class="btn btn-danger btn-sm" title="Sil">
+                                                <i class="fas fa-trash-alt">Sil</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="text-center mt-4">
+                            <div class="btn-group">
+                                @if (Model?.Pagination != null)
+                                {
+                                    for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                                    {
+                                        <a asp-action="Details" asp-route-PageNumber="@i"
+                                           class="btn @(i == Model.Pagination.CurrentPage ? "btn-secondary" : "btn-outline-dark")">
+                                            @i
+                                        </a>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group-item text-center text-muted">
+                            Bu seriye ait henüz bir bölüm bulunmuyor.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,217 @@
+﻿@model ChapterWithCommentDto
+@{
+    ViewData["Title"] = $"Bölüm {Model.Chapter.ChapterNo} - {Model.Chapter.Comic.Title}";
+}
+
+<style>
+    /* Sadece okuma sayfası için gerekli CSS */
+    .reader-page-container img {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin-bottom: 1px; /* Sayfalar arasında boşluk bırakır */
+    }
+
+    .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 20px 0;
+    }
+
+    .reader-title {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+</style>
+
+
+<div class="page-content">
+    <!-- ***** Resimler ***** -->
+    <div class="game-details">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="reader-title">
+                    <h1 class="my-4"><a asp-controller="Comics" asp-action="Details" asp-route-comicSlug="@Model.Chapter.Comic.Slug">@Model.Chapter.Comic.Title</a></h1>
+                    <h3 class="mb-4 text-muted">Bölüm @Model.Chapter.ChapterNo - @Model.Chapter.Title</h3>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="content">
+                    <div class="row">
+
+                        <div class="navigation-buttons">
+                            @if (ViewBag.PreviousChapterNo != null)
+                            {
+                                <a asp-controller="Reader"
+                                   asp-action="Read"
+                                   asp-route-comicSlug="@ViewBag.ComicSlug"
+                                   asp-route-chapterNo="@ViewBag.PreviousChapterNo"
+                                   class="btn btn-secondary">Önceki Bölüm</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Comics"
+                                   asp-action="Details"
+                                   asp-route-comicSlug="@ViewBag.ComicSlug"
+                                   class="btn btn-info">@Model.Chapter.Comic.Title</a>
+                            }
+
+                            @if (ViewBag.NextChapterNo != null)
+                            {
+                                <a asp-controller="Reader"
+                                   asp-action="Read"
+                                   asp-route-comicSlug="@ViewBag.ComicSlug"
+                                   asp-route-chapterNo="@ViewBag.NextChapterNo"
+                                   class="btn btn-secondary">Sonraki Bölüm</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Comics"
+                                   asp-action="Details"
+                                   asp-route-comicSlug="@ViewBag.ComicSlug"
+                                   class="btn btn-info">@Model.Chapter.Comic.Title</a>
+                            }
+                        </div>
+
+                        @foreach (var pages in Model.Chapter.Pages.OrderBy(p => p.PageNumber))
+                        {
+                            <img src="@pages.ImageUrl" alt="Sayfa @pages.PageNumber" class="img-fluid" />
+                        }
+
+                        <div class="navigation-buttons">
+                            @if (ViewBag.PreviousChapterNo != null)
+                            {
+                                <a asp-controller="Reader"
+                                   asp-action="Read"
+                                   asp-route-comicSlug="@ViewBag.ComicSlug"
+                                   asp-route-chapterNo="@ViewBag.PreviousChapterNo"
+                                   class="btn btn-secondary">Önceki Bölüm</a>
+                            }
+                            else
+                            {
+                                <div>
+                                    <a asp-controller="Comics"
+                                       asp-action="Details"
+                                       asp-route-comicSlug="@ViewBag.ComicSlug"
+                                       class="btn btn-info">@Model.Chapter.Comic.Title</a>
+                                </div>
+                            }
+
+                            @if (ViewBag.NextChapterNo != null)
+                            {
+                                <a asp-controller="Reader"
+                                   asp-action="Read"
+                                   asp-route-comicSlug="@ViewBag.ComicSlug"
+                                   asp-route-chapterNo="@ViewBag.NextChapterNo"
+                                   class="btn btn-secondary">Sonraki Bölüm</a>
+                            }
+                            else
+                            {
+                                <div>
+                                    <a asp-controller="Comics"
+                                       asp-action="Details"
+                                       asp-route-comicSlug="@ViewBag.ComicSlug"
+                                       class="btn btn-info">@Model.Chapter.Comic.Title</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ***** Reactions ***** -->
+    <div id="reactions">
+        @await Component.InvokeAsync("_ReactionsComponentPartial", new { chapterId = @Model.Chapter.ChapterId });
+    </div>
+
+    <!-- ***** Yorumlar 1 ***** -->
+    <div id="comments">
+        <div class="game-details">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Yorumlar</h2>
+                </div>
+                <div class="col-lg-12">
+                    <div class="content">
+                        <div class="row">
+                            <div class="panel">
+                                <div class="panel-body">
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <form asp-action="AddComment" method="post">
+                                            <input type="hidden" asp" name="comicId" value="@Model.Chapter.Comic.ComicId" />
+                                            <input type="hidden" asp" name="chapterId" value="@Model.Chapter.ChapterId" />
+
+                                            <textarea name="newComment" class="form-control" rows="2" placeholder="What are you thinking?"></textarea>
+                                            <div class="mar-top clearfix">
+                                                <button class="btn btn-sm btn-primary pull-right" type="submit"><i class="fa fa-pencil fa-fw"></i> Paylaş</button>
+                                                <a class="btn btn-trans btn-icon fa fa-video-camera add-tooltip" href="#"></a>
+                                                <a class="btn btn-trans btn-icon fa fa-camera add-tooltip" href="#"></a>
+                                                <a class="btn btn-trans btn-icon fa fa-file add-tooltip" href="#"></a>
+                                            </div>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-xl-center">Yorum yapmak için giriş yapmalısınız.</p>
+                                    }
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <div class="panel-body">
+                                    @if (Model.commentWithPaginations.Comments != null && Model.commentWithPaginations.Comments.Any())
+                                    {
+                                        @foreach (var comment in Model.commentWithPaginations.Comments.Where(c => c.ParentCommentId == null).OrderByDescending(c => c.CreatedAt))
+                                        {
+                                            @await Html.PartialAsync("_CommentPartial", comment)
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="list-group-item text-center text-muted">
+                                            Bölüme yorum yapan ilk siz olun.
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ***** Paginations Buttons ***** -->
+    <div class="col-lg-12">
+        <div class="btn-group d-flex justify-content-center">
+            @if (Model?.commentWithPaginations.Pagination != null)
+            {
+                for (int i = 1; i <= Model.commentWithPaginations.Pagination.TotalPages; i++)
+                {
+                    if (i == Model.commentWithPaginations.Pagination.CurrentPage)
+                    {
+                        <div class="main-button ">
+                            <a asp-action="Read" asp-route-PageNumber="@i" class="btn btn-secondary" )">
+                                @i
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="main-border-button">
+                            <a asp-action="Read" asp-route-PageNumber="@i" class="btn  btn-outline-dark" )">
+                                @i
+                            </a>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="~/css/comments.css">
+

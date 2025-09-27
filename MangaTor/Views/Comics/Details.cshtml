@@ -1,0 +1,196 @@
+﻿@model ComicDetailViewModel
+
+@{
+    ViewData["Title"] = $"{Model.Comic.Title} Bölümleri";
+
+}
+@{
+    var averageScore = Model.AverageScore; // ViewBag null ise 0 yap
+    var userScore = Model.UserScore ?? 0; // ViewBag null ise 0 yap
+    var comicId = Model.Comic.ComicId;
+}
+@Html.AntiForgeryToken()
+
+
+<div class="page-content">
+
+    <!-- ***** Comic Details ***** -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="feature-banner header-text">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <img src="@Model.Comic.CoverImageUrl" class="card-img-top" alt="@Model.Comic.Title Kapak Resmi" style="object-fit: cover; height: 350px ; border-radius: 23px;">
+                       </div>
+                    <div class="col-lg-8">
+                        <div>
+                            @await Html.PartialAsync("_StarRating", averageScore, new ViewDataDictionary(ViewData) { { "ComicIdParam", comicId }, { "UserScore", userScore } })
+                        </div>
+                        <div class="top-downloaded">
+                            <div class="heading-section">
+                                <h4>@Model.Comic.Title</h4>
+                                
+                            </div>
+                            <p class="text-muted mb-1"><strong>Konu:</strong> @Model.Comic.Description</p>
+                            <p class="text-muted mb-1"><strong>Tarih:</strong> @Model.Comic.DateTime.ToShortDateString()</p>
+                            <p class="text-muted mb-1"><strong>Bölüm Sayısı:</strong> @Model.Chapters?.Count()</p>
+                            <p class="text-muted mb-1"><strong>Yazar:</strong> @Model.Comic.Author</p>
+                            <p class="text-muted mb-1"><strong>URL:</strong> @Model.Comic.Slug</p>
+                            <p class="text-muted mb-1"><strong>Yayın Durumu:</strong> @(Model.Comic.IsActive ? "Aktif" : "Pasif")</p>
+                            <p class="text-muted mb-1">@Model.UserScore</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ***** Bölümler 1 ***** -->
+    <div class="game-details">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>@Model.Comic.Title Bölümler</h2>
+            </div>
+            <div class="col-lg-12">
+                <div class="content">
+                    <div class="row">
+                        @if (Model.Chapters != null && Model.Chapters.Any())
+                        {
+                            @for (int i = 0; i < Model.Chapters.OrderBy(c => c.ChapterNo).Count(); i++)
+                            {
+                                var chapter = Model.Chapters.OrderBy(c => c.ChapterNo).ElementAt(i);
+                                if (i % 2 == 0)
+                                {
+                                    <div class="col-lg-6">
+                                        <div class="left-info">
+                                            <div class="left">
+                                                <a asp-controller="Reader"
+                                                   asp-action="Read"
+                                                   asp-route-comicSlug="@Model.Comic.Slug"
+                                                   asp-route-chapterNo="@chapter.ChapterNo">
+                                                    <h4>Bölüm @chapter.ChapterNo - @chapter.Title</h4>
+                                                    <span>@chapter.ReleaseDate.ToShortDateString()</span>
+                                                </a>
+                                            </div>
+                                            <ul>
+                                                <li><i class="fa fa-star"></i> 4.8</li>
+                                                <li><i class="fa fa-download"></i> 2.3M</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-lg-6">
+                                        <div class="right-info">
+                                            <a asp-controller="Reader"
+                                               asp-action="Read"
+                                               asp-route-comicSlug="@Model.Comic.Slug"
+                                               asp-route-chapterNo="@chapter.ChapterNo">
+                                                <h4>Bölüm @chapter.ChapterNo - @chapter.Title</h4>
+                                                <span>@chapter.ReleaseDate.ToShortDateString()</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+
+
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ***** Yorumlar 1 ***** -->
+    <div id="comments">
+    <div class="game-details">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Yorumlar</h2>
+            </div>
+            <div class="col-lg-12">
+                <div class="content">
+                    <div class="row">
+                        <div class="panel">
+                            <div class="panel-body">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <form asp-action="AddComment" method="post">
+                                        <input type="hidden" asp" name="comicId" value="@Model.Comic.ComicId" />
+                                        <textarea name="newComment" class="form-control" rows="2" placeholder="What are you thinking?"></textarea>
+                                        <div class="mar-top clearfix">
+                                            <button class="btn btn-sm btn-primary pull-right" type="submit"><i class="fa fa-pencil fa-fw"></i> Paylaş</button>
+                                            <a class="btn btn-trans btn-icon fa fa-video-camera add-tooltip" href="#"></a>
+                                            <a class="btn btn-trans btn-icon fa fa-camera add-tooltip" href="#"></a>
+                                            <a class="btn btn-trans btn-icon fa fa-file add-tooltip" href="#"></a>
+                                        </div>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <p class="text-xl-center">Yorum yapmak için giriş yapmalısınız.</p>
+                                }
+                            </div>
+                        </div>
+                        <div class="panel">
+                            <div class="panel-body">
+                                @if (Model.commentWithPaginations.Comments != null && Model.commentWithPaginations.Comments.Any())
+                                {
+                                    @foreach (var comment in Model.commentWithPaginations.Comments.Where(c => c.ParentCommentId == null).OrderByDescending(c => c.CreatedAt))
+                                    {
+                                        @await Html.PartialAsync("_CommentPartial", comment)
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="list-group-item text-center text-muted">
+                                        Bu seriye ait henüz bir bölüm bulunmuyor.
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- ***** Paginations Buttons ***** -->
+    <div class="col-lg-12">
+        <div class="btn-group d-flex justify-content-center">
+            @if (Model?.commentWithPaginations.Pagination != null)
+            {
+                for (int i = 1; i <= Model.commentWithPaginations.Pagination.TotalPages; i++)
+                {
+                    if (i == Model.commentWithPaginations.Pagination.CurrentPage)
+                    {
+                        <div class="main-button ">
+                            <a asp-action="Details" asp-route-PageNumber="@i" class="btn btn-secondary" )">
+                                @i
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="main-border-button">
+                            <a asp-action="Details" asp-route-PageNumber="@i" class="btn  btn-outline-dark" )">
+                                @i
+                            </a>
+                        </div>
+                    }
+                }
+            }
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<link rel="stylesheet" href="~/css/comments.css">
+

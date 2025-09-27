@@ -1,0 +1,180 @@
+﻿@model ChapterListViewModel
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+
+<div class="page-content">
+
+    <!-- ***** Banner Start ***** -->
+    <div class="main-banner">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="header-text">
+                    <h6>Welcome To</h6>
+                    <h4><em>Browse</em> Our Popular Comics Here</h4>
+                    <div class="main-button">
+                        <a asp-area="" asp-controller="Comics" asp-action="Index">Browse Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Banner End ***** -->
+    <!-- ***** Most Popular Start ***** -->
+    <div class="most-popular">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="heading-section">
+                    <h4>Son Eklenen Bölümler</h4>
+                </div>
+                <div class="row">
+                    @foreach (var chapter in Model.Chapters)
+                    {
+                        <div class="col-lg-3 col-sm-6">
+                            <div class="item">
+                                <a asp-controller="Reader" asp-action="Read" asp-route-comicSlug="@chapter.Comic.Slug" asp-route-chapterNo="@chapter.ChapterNo">
+                                    <img src="@chapter.Comic.CoverImageUrl" alt="@chapter.Comic.Title Kapak Resmi" style="object-fit: cover; height: 200px;">
+                                </a>
+
+                                <h4>
+                                    <a asp-controller="Reader"asp-action="Read"asp-route-comicSlug="@chapter.Comic.Slug"asp-route-chapterNo="@chapter.ChapterNo">
+                                        Bölüm @chapter.ChapterNo -- @chapter.ReleaseDate.ToString("dd MMMM")
+                                    </a>
+                                    <br>
+                                    <span>
+                                        <a asp-controller="Comics"asp-action="Details"asp-route-comicSlug="@chapter.Comic.Slug">
+                                            @chapter.Comic.Title</a>
+                                    </span>
+                                </h4>
+
+                                <ul>
+                                    <li><i class="fa fa-star"></i> 4.8</li>
+                                    <li><i class="fa fa-download"></i> 2.3M</li>
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                    <!-- ***** Paginations Buttons ***** -->
+                    <div class="col-lg-12">
+                        <div class="btn-group d-flex justify-content-center">
+                            @if (Model?.Pagination != null)
+                            {
+                                for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                                {
+                                    if (i == Model.Pagination.CurrentPage)
+                                    {
+                                        <div class="main-button ">
+                                            <a asp-action="Index" asp-route-PageNumber="@i" class="btn btn-secondary" )">
+                                                @i
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="main-border-button">
+                                            <a asp-action="Index" asp-route-PageNumber="@i" class="btn  btn-outline-dark" )">
+                                                @i
+                                            </a>
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Son Eklenen Comics ***** -->
+    <div class="gaming-library">
+        <div class="col-lg-12">
+            <div class="heading-section">
+                <h4>Son Eklenen Seriler</h4>
+            </div>
+            <div class="item">
+                @await Component.InvokeAsync("_HomeLastComicComponentPartial")
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="main-button">
+                <a href="~/template_cyborg/profile.html">View Your Library</a>
+            </div>
+        </div>
+    </div>
+    <!-- ***** Gaming Library End ***** -->
+</div>
+
+
+
+
+<!-- eski kod -->
+<div>
+@*
+<div class="container mt-4">
+    <div class="p-5 mb-4 bg-dark rounded-3 text-center ">
+        <div class="container-fluid py-5 ">
+            <h1 class="display-5 fw-bold">Hoş Geldiniz!</h1>
+            <p class="fs-4">En sevdiğiniz çizgi romanları, en kaliteli haliyle okumaya başlayın. Binlerce bölüm sizi bekliyor!</p>
+            <a asp-controller="Comics" asp-action="Index" class="btn btn-primary btn-lg">Tüm Serileri Keşfet</a>
+        </div>
+    </div>
+
+    <h2 class="text-center my-5">Son Eklenen Bölümler</h2>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4 mb-5">
+        @foreach (var chapter in Model.Chapters)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <a asp-controller="Reader"
+                       asp-action="Read"
+                       asp-route-comicSlug="@chapter.Comic.Slug"
+                       asp-route-chapterNo="@chapter.ChapterNo"
+                       class="text-decoration-none">
+
+                        <img src="@chapter.Comic.CoverImageUrl" class="card-img-top" alt="@chapter.Comic.Title Kapak Resmi" style="object-fit: cover; height: 200px;">
+                    </a>
+
+                    <div class="card-body d-flex flex-column p-2">
+                        <h6 class="card-title text-center text-truncate">
+                            <a asp-controller="Reader"
+                               asp-action="Read"
+                               asp-route-comicSlug="@chapter.Comic.Slug"
+                               asp-route-chapterNo="@chapter.ChapterNo"
+                               class="text-light text-decoration-none">
+                                Bölüm @chapter.ChapterNo
+                                --
+                                @chapter.ReleaseDate.ToString("dd MMMM")
+                            </a>
+                        </h6>
+                        <p class="card-text text-muted text-center text-truncate">
+                            <a asp-controller="Comics"
+                               asp-action="Details"
+                               asp-route-comicSlug="@chapter.Comic.Slug"
+                               class="text-primary text-decoration-none  ">
+                                @chapter.Comic.Title
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="text-center mt-4">
+        <div class="btn-group">
+            @if (Model?.Pagination != null)
+            {
+                for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+                {
+                    <a asp-action="Index" asp-route-PageNumber="@i"
+                       class="btn @(i == Model.Pagination.CurrentPage ? "btn-secondary" : "btn-outline-dark")">
+                        @i
+                    </a>
+                }
+            }
+        </div>
+    </div>
+</div>
+*@
+</div>

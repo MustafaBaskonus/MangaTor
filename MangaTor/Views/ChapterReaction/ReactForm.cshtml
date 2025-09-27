@@ -1,0 +1,31 @@
+﻿@model MangaTor.Models.ChapterReactionViewModel
+@{
+    ViewData["Title"] = "ReactForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h3>@Model.ComicTitle - Bölüm: @Model.ChapterTitle</h3>
+
+<form asp-action="React" method="post">
+    <input type="hidden" name="chapterId" value="@Model.ChapterId" />
+
+    <div>
+        @foreach (var reaction in Model.ReactionTypes)
+        {
+            <button type="submit" name="reactionTypeId" value="@reaction.Id" class="btn btn-outline-primary">
+                @reaction.Name
+            </button>
+        }
+    </div>
+</form>
+
+<h4>Tepkiler:</h4>
+<ul>
+    @foreach (var reaction in Model.ReactionTypes)
+    {
+        var count = ViewBag.ReactionCounts != null && ViewBag.ReactionCounts.ContainsKey(reaction.Id)
+        ? ViewBag.ReactionCounts[reaction.Id] : 0;
+        <li>@reaction.Name: @count</li>
+    }
+</ul>
