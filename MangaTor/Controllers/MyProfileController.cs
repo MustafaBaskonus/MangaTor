@@ -1,37 +1,50 @@
 ﻿using AutoMapper;
 using DAL.Entities;
 using DAL.Entities.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Services.Contacts;
 
 namespace MangaTor.Controllers
 {
+    [Authorize(Roles = "User,Admin")]
     public class MyProfileController : Controller
     {
         private readonly IServiceManager _services;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IMapper _mapper;
 
-        public MyProfileController(IServiceManager services, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper)
+        public MyProfileController(IServiceManager services)
         {
             _services = services;
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _mapper = mapper;
         }
 
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(this.HttpContext.User);
+            var profileDto = await _services.ProfileService.GetUserProfileAsync(this.HttpContext);
+            return View("Index",profileDto);
+        }
 
-            var profileDto = _mapper.Map<ProfileDto>(user);
-            profileDto.Roles =  new HashSet<string>(await _userManager.GetRolesAsync(user));
-            profileDto.comicRating = await _services.RatingService.AllRateForUserId(user.Id);
-
-            return View(profileDto);
+        [HttpGet]
+        public async Task<IActionResult> ProfileImage()
+        {
+            var profileImageUrl = await _services.ProfileService.GetUserProfileImageAsync(this.HttpContext);
+            var defaultImages = new List<string>()
+            {
+                profileImageUrl,
+                "/images/profile/Default/pic-1.png",
+                "/images/profile/Default/pic-2.png",
+                "/images/profile/Default/pic-3.png",
+                "/images/profile/Default/pic-4.png"
+            };
+            return View("ProfileImage", profileImageUrl);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ProfileImage(IFormFile file)
+        {
+            await _services.ProfileService.UpdateProfileImage(this.HttpContext, file);
+            return RedirectToAction("Index");
         }
     }
 }

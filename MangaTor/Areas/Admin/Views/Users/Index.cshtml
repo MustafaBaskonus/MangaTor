@@ -40,7 +40,14 @@
                                     <tr>
                                         <td>@(counter++)</td>
                                         <td class="py-1">
-                                            <img src="~/template/assets/images/faces-clipart/pic-3.png" alt="image" />
+                                            @if (user.ProfileImageUrl is not null)
+                                            {
+                                                <img src="@user.ProfileImageUrl" alt="@user.UserName profil resmi" />
+                                            }
+                                            else
+                                            {
+                                                <img src="~/template/assets/images/faces-clipart/pic-3.png" alt="default images" />
+                                            }
                                         </td>
                                         <td>@user.UserName</td>
                                         <td>
@@ -82,7 +89,7 @@
 </div>
 
 @section Scripts
-        {
+{
     <script type="text/javascript">
         $(document).ready(() => {
             $('[data-toggle="tooltip"]').tooltip()

@@ -34,6 +34,7 @@ builder.Services.AddScoped<IAuthService, AuthManager>();
 builder.Services.AddScoped<ICommentService, CommentManager>();
 builder.Services.AddScoped<IReactionService, ReactionManager>();
 builder.Services.AddScoped<IRatingService, RatingManager>();
+builder.Services.AddScoped<IProfileService, ProfileManager>();
 builder.Services.AddScoped<IServiceManager,ServiceManager>();
 
 builder.Services.AddDistributedMemoryCache();

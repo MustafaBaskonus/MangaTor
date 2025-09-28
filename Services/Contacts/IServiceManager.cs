@@ -15,6 +15,7 @@ namespace Services.Contacts
         ICommentService CommentService { get; }
         IReactionService ReactionService { get; }
         IRatingService RatingService { get; }
+        IProfileService ProfileService { get; }
 
     }
 }
