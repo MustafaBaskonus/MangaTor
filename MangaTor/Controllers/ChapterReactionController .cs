@@ -14,32 +14,29 @@ namespace MangaTor.Controllers
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using Services.Contacts;
 
     namespace MangaTor.Controllers
     {
         [Authorize]
         public class ChapterReactionController : Controller
         {
-            private readonly AppDbContext _context;
-            private readonly UserManager<ApplicationUser> _userManager;
+            private readonly IServiceManager _services;
 
-            public ChapterReactionController(AppDbContext context, UserManager<ApplicationUser> userManager)
-            {
-                _context = context;
-                _userManager = userManager;
+            public ChapterReactionController( IServiceManager services)
+            { 
+                _services = services;
             }
 
             // Bölüm için tepki verme formunu göster
             [HttpGet]
             public async Task<IActionResult> ReactForm(int chapterId)
             {
-                var chapter = await _context.Chapters
-                    .Include(c => c.Comic)
-                    .FirstOrDefaultAsync(c => c.ChapterId == chapterId);
+                var chapter = await _services.ChapterService.FindChapterwithComicAsync(chapterId);
 
                 if (chapter == null) return NotFound();
 
-                var reactionTypes = await _context.ReactionTypes.ToListAsync();
+                var reactionTypes = await _services.ReactionService.AllReactType();
 
                 var model = new ChapterReactionViewModel
                 {
@@ -56,29 +53,11 @@ namespace MangaTor.Controllers
             [HttpPost]
             public async Task<IActionResult> React(int chapterId, int reactionTypeId)
             {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null) return Unauthorized();
-
-                var existing = await _context.UserChapterReactions
-                    .FirstOrDefaultAsync(r => r.UserId == user.Id && r.ChapterId == chapterId && r.ReactionTypeId == reactionTypeId);
-
-                if (existing != null)
+                if(this.HttpContext.User is null)
                 {
-                    _context.UserChapterReactions.Remove(existing);
+                    return Unauthorized();
                 }
-                else
-                {
-                    var reaction = new UserChapterReaction
-                    {
-                        UserId = user.Id,
-                        ChapterId = chapterId,
-                        ReactionTypeId = reactionTypeId,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.UserChapterReactions.Add(reaction);
-                }
-
-                await _context.SaveChangesAsync();
+                await _services.ReactionService.Reacting(chapterId,reactionTypeId,this.HttpContext);
                 return RedirectToAction("ReactForm", new { chapterId });
             }
         }

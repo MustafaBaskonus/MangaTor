@@ -16,11 +16,7 @@ namespace MangaTor.Controllers
             _services = services;
         }
 
-
-
-
         [HttpGet]
-
         public async Task<IActionResult> AddReaction(int chapterId, int reactionTypeId, string comicSlug)
         {
             await _services.ReactionService.AddReaction(chapterId, reactionTypeId, HttpContext);
@@ -29,6 +25,5 @@ namespace MangaTor.Controllers
             //return RedirectToAction("Read", "Reader", new { comicSlug = comicSlug, chapterNo = chapter.ChapterNo });
             return RedirectToAction("Read","Reader",new { comicSlug = comicSlug, chapterNo = chapter.ChapterNo },fragment: "reactions");
         }
-
     }
 }

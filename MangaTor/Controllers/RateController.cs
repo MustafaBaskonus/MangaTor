@@ -8,21 +8,21 @@ namespace MangaTor.Controllers
     [Authorize(Roles ="User,Admin")]
     public class RateController : Controller
     {
-        private readonly IServiceManager _service;
+        private readonly IServiceManager _services;
 
-        public RateController(IServiceManager service)
+        public RateController(IServiceManager services)
         {
-            _service = service;
+            _services = services;
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddRate(int comicId, int rating)//, HttpContext httpContext
+        public async Task<IActionResult> AddRate(int comicId, int rating)
         {
-            await _service.RatingService.AddRateAsync(comicId, rating, this.HttpContext);
-            var comic = await _service.ComicService.FindComicWithId(comicId);
+            await _services.RatingService.AddRateAsync(comicId, rating, this.HttpContext);
+            var comic = await _services.ComicService.FindComicWithId(comicId);
 
 
-            var newScore = (int)_service.RatingService.GetComicAverageScore(comicId);
+            var newScore = (int)_services.RatingService.GetComicAverageScore(comicId);
             return Json(new { success = true, score = newScore });
         }
     }

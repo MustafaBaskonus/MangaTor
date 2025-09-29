@@ -16,23 +16,23 @@ namespace MangaTor.Areas.Admin.Controllers
     [Authorize(Roles ="Admin")]
     public class ComicsController : Controller
     {
-        private readonly IServiceManager _serviceManager;
+        private readonly IServiceManager _services;
         private readonly IMapper _mapper;
 
-        public ComicsController(IServiceManager serviceManager, IMapper mapper)
+        public ComicsController(IServiceManager services, IMapper mapper)
         {
-            _serviceManager = serviceManager;
+            _services = services;
             _mapper = mapper;
         }
 
         public IActionResult Index([FromQuery] ComicRequestParameters comicRequest)
         {
-            var comics = _serviceManager.ComicService.AllComicsAndChapters(false, comicRequest);
+            var comics = _services.ComicService.AllComicsAndChapters(false, comicRequest);
             Pagination pagination = new Pagination()
             {
                 CurrentPage = comicRequest.PageNumber,
                 ItemsPerPage = comicRequest.PageSize,
-                TotalItems = _serviceManager.ComicService.TotalComic(comicRequest),
+                TotalItems = _services.ComicService.TotalComic(comicRequest),
             };
             return View(new ComicListViewModel()
             {
@@ -44,7 +44,7 @@ namespace MangaTor.Areas.Admin.Controllers
         [HttpGet("Admin/Comics/ComicCreate")]
         public async Task<IActionResult >ComicCreate()
         {
-            var categories = await _serviceManager.CategoryService.GetAllCategoriesAsync(false);
+            var categories = await _services.CategoryService.GetAllCategoriesAsync(false);
 
             ViewBag.Categories = new SelectList(categories, "CategoryId", "Name");
             return View();
@@ -54,14 +54,14 @@ namespace MangaTor.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ComicCreate([FromForm] AdminComicDto comicDto, IFormFile file)
         {
-            await _serviceManager.ComicService.ComicCreate(comicDto, file);
+            await _services.ComicService.ComicCreate(comicDto, file);
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var comic = await _serviceManager.ComicService.FindComicWithId(id);
-            var categories = await _serviceManager.CategoryService.GetAllCategoriesAsync(false);
+            var comic = await _services.ComicService.FindComicWithId(id);
+            var categories = await _services.CategoryService.GetAllCategoriesAsync(false);
 
             ViewBag.Categories = new SelectList(categories, "CategoryId", "Name");
             AdminComicDto comicDto =_mapper.Map<AdminComicDto>(comic);
@@ -73,13 +73,13 @@ namespace MangaTor.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromForm] AdminComicDto comicDto, IFormFile? file)
         {
-            await _serviceManager.ComicService.ComicUpdate(comicDto, file);
+            await _services.ComicService.ComicUpdate(comicDto, file);
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            await _serviceManager.ComicService.ComicDelete(id);
+            await _services.ComicService.ComicDelete(id);
             return RedirectToAction(nameof(Index));
         }
 
@@ -90,14 +90,14 @@ namespace MangaTor.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var comic = await _serviceManager.ComicService.FindComic(comicSlug);
+            var comic = await _services.ComicService.FindComic(comicSlug);
             chapterRequest.ComicId = comic.ComicId;
-            var chapters = _serviceManager.ChapterService.FindChapterComicId(comic.ComicId, chapterRequest);
+            var chapters = _services.ChapterService.FindChapterComicId(comic.ComicId, chapterRequest);
             Pagination pagination = new Pagination()
             {
                 CurrentPage = chapterRequest.PageNumber,
                 ItemsPerPage = chapterRequest.PageSize,
-                TotalItems = _serviceManager.ChapterService.TotalChapterForComic(chapterRequest)
+                TotalItems = _services.ChapterService.TotalChapterForComic(chapterRequest)
             };
 
             return View(new ComicWithChaptersDto()

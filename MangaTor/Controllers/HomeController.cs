@@ -9,21 +9,21 @@ using Services.Contacts;
 public class HomeController : Controller
 {
 
-    private readonly IServiceManager _service;
+    private readonly IServiceManager _services;
 
-    public HomeController(IServiceManager service)
+    public HomeController(IServiceManager services)
     {
-        _service = service;
+        _services = services;
     }
 
     public async Task<IActionResult> Index([FromQuery] ChapterRequestParameters chapteRequest)
     {
-        var homeChapters = _service.ChapterService.HomeChapters(chapteRequest,8).ToList();
+        var homeChapters = _services.ChapterService.HomeChapters(chapteRequest,8).ToList();
         Pagination pagination = new Pagination() 
         {   
             CurrentPage=chapteRequest.PageNumber,
             ItemsPerPage=chapteRequest.PageSize,
-            TotalItems=_service.ChapterService.TotalChapter(false)
+            TotalItems=_services.ChapterService.TotalChapter(false)
         };  
 
         return View(new ChapterListViewModel()

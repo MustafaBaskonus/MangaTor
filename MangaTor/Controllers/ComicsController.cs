@@ -13,24 +13,23 @@ namespace MangaTor.Controllers
 {
     public class ComicsController : Controller
     {
-        private readonly IServiceManager _serviceManager;
-        private readonly IMapper _mapper;
+        private readonly IServiceManager _services;
+     
 
-        public ComicsController(IServiceManager serviceManager, IMapper mapper)
+        public ComicsController(IServiceManager services)
         {
-            _serviceManager = serviceManager;
-            _mapper = mapper;
+            _services = services;
         }
 
 
         public IActionResult Index([FromQuery] ComicRequestParameters comicRequest)
         {
-            var comics = _serviceManager.ComicService.AllComics(false,comicRequest);
+            var comics = _services.ComicService.AllComics(false,comicRequest);
             var pagination = new Pagination()
             {
                 CurrentPage = comicRequest.PageNumber,
                 ItemsPerPage = comicRequest.PageSize,
-                TotalItems = _serviceManager.ComicService.TotalComic(comicRequest),
+                TotalItems = _services.ComicService.TotalComic(comicRequest),
             };
             return View(new ComicListViewModel()
             {
@@ -49,15 +48,15 @@ namespace MangaTor.Controllers
                 return NotFound();
             }
 
-            var comic = await _serviceManager.ComicService.OneComicWithChaptesAsync(comicSlug);
+            var comic = await _services.ComicService.OneComicWithChaptesAsync(comicSlug);
             commentRequest.ComicId = comic.ComicId;
 
-            var comments = await _serviceManager.CommentService.GetAllCommentsDtoForComic(commentRequest);
+            var comments = await _services.CommentService.GetAllCommentsDtoForComic(commentRequest);
             Pagination pagination = new Pagination()
             {
                 CurrentPage = commentRequest.PageNumber,
                 ItemsPerPage = commentRequest.PageSize,
-                TotalItems = _serviceManager.CommentService.TotolComment(commentRequest),
+                TotalItems = _services.CommentService.TotolComment(commentRequest),
             };
             var commentWithPaginations = new CommentListViewModel()
             {
@@ -65,8 +64,8 @@ namespace MangaTor.Controllers
                 Pagination = pagination
             };
             //score
-            var averageScore = _serviceManager.RatingService.GetComicAverageScore(comic.ComicId);
-            var userScore = await _serviceManager.RatingService.GetScoreByUser(comic.ComicId,this.HttpContext);
+            var averageScore = _services.RatingService.GetComicAverageScore(comic.ComicId);
+            var userScore = await _services.RatingService.GetScoreByUser(comic.ComicId,this.HttpContext);
             var comicDetailDto = new ComicDetailViewModel()
             {
                 Comic = comic,
@@ -88,7 +87,7 @@ namespace MangaTor.Controllers
         [HttpPost]
         public async Task<IActionResult >AddComment(int comicId, string newComment,int? parentId)
         {
-            var slug = await _serviceManager.CommentService.CreateCommentForComic(comicId, newComment,parentId, HttpContext);
+            var slug = await _services.CommentService.CreateCommentForComic(comicId, newComment,parentId, HttpContext);
             //return RedirectToAction("Details", new { comicSlug = slug });
             return RedirectToAction("Details","Comics",new { comicSlug = slug },fragment: "comments");
         }

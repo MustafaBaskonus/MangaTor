@@ -14,13 +14,11 @@ namespace MangaTor.Controllers
 {
     public class ReaderController : Controller
     {
-        private readonly AppDbContext _context;
-        private readonly IServiceManager _serviceManager;
+        private readonly IServiceManager _services;
 
-        public ReaderController(AppDbContext context, IServiceManager serviceManager)
+        public ReaderController(IServiceManager services)
         {
-            _context = context;
-            _serviceManager = serviceManager;
+            _services = services;
         }
 
         [HttpGet("Read/{comicSlug}/{chapterNo}")]
@@ -31,10 +29,7 @@ namespace MangaTor.Controllers
                 return NotFound();
             }
 
-            var chapter = await _context.Chapters
-                                        .Include(c => c.Pages.OrderBy(p => p.PageNumber))
-                                        .Include(c => c.Comic)
-                                        .FirstOrDefaultAsync(c => c.Comic.Slug == comicSlug && c.ChapterNo == chapterNo);
+            var chapter = await _services.ChapterService.FindChapterwithComicAndPagesAsync(chapterNo, comicSlug);
 
             if (chapter == null)
             {
@@ -42,11 +37,8 @@ namespace MangaTor.Controllers
             }
 
 
-            var allChaptersInSeries = await _context.Chapters
-                                                  .Where(c => c.ComicId == chapter.ComicId)
-                                                  .OrderBy(c => c.ChapterNo)
-                                                  .ToListAsync();
-
+            var allChaptersInSeries = await _services.ChapterService.AllChaptersInSeries(chapter.ChapterId);
+                                                  
             var currentIndex = allChaptersInSeries.FindIndex(c => c.ChapterId == chapter.ChapterId);
 
 
@@ -65,20 +57,18 @@ namespace MangaTor.Controllers
 
             //paination for comments
             commentRequest.ChapterId = chapter.ChapterId;
-            var comments = await _serviceManager.CommentService.GetAllCommentsDtoForChapter(commentRequest);
+            var comments = await _services.CommentService.GetAllCommentsDtoForChapter(commentRequest);
             Pagination pagination = new Pagination()
             {
                 CurrentPage = commentRequest.PageNumber,
                 ItemsPerPage = commentRequest.PageSize,
-                TotalItems = _serviceManager.CommentService.TotolComment(commentRequest),
+                TotalItems = _services.CommentService.TotolComment(commentRequest),
             };
             var commentWithPaginations = new CommentListViewModel()
             {
                 Comments = comments,
                 Pagination = pagination
             };
-
-
 
 
             ChapterWithCommentDto chapterDto = new ChapterWithCommentDto()
@@ -93,13 +83,9 @@ namespace MangaTor.Controllers
         [HttpPost]
         public async Task<IActionResult> AddComment(int chapterId, string newComment, int? parentId)
         {
-            var chapter = await _serviceManager.CommentService.CreateCommentForChapter(chapterId, newComment, parentId, HttpContext);
+            var chapter = await _services.CommentService.CreateCommentForChapter(chapterId, newComment, parentId, HttpContext);
             //return RedirectToAction("Read", new { comicSlug = chapter.Comic.Slug, chapterNo = chapter.ChapterNo });
             return RedirectToAction("Read", "Reader", new { comicSlug = chapter.Comic.Slug, chapterNo = chapter.ChapterNo }, fragment: "comments");
         }
-
-
-
-
     }
 }

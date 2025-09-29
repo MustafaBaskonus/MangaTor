@@ -10,16 +10,16 @@ namespace MangaTor.Areas.Admin.Controllers
     //[Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
-        private readonly IServiceManager _manager;
+        private readonly IServiceManager _services;
 
-        public UsersController(IServiceManager manager)
+        public UsersController(IServiceManager services)
         {
-            _manager = manager;
+            _services = services;
         }
 
         public async Task<ActionResult >Index()
         {
-            var usersDto = await _manager.AuthService.GetUsersDtoAsymc();
+            var usersDto = await _services.AuthService.GetUsersDtoAsymc();
             return View(usersDto);
         }
         public IActionResult Create()
@@ -27,7 +27,7 @@ namespace MangaTor.Areas.Admin.Controllers
             return View(new UserDtoForInsertion()
             {
                 Roles = new HashSet<string>
-                (_manager.AuthService
+                (_services.AuthService
                 .GetRoles()
                 .Select(x => x.Name)
                 .ToList())
@@ -38,7 +38,7 @@ namespace MangaTor.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] UserDtoForInsertion userDto)
         {
-            var result = await _manager.AuthService.CreateUserAsync(userDto);
+            var result = await _services.AuthService.CreateUserAsync(userDto);
             return result.Succeeded
                 ? RedirectToAction("Index")
                 : View();
@@ -47,7 +47,7 @@ namespace MangaTor.Areas.Admin.Controllers
 
         public async Task<IActionResult> Update([FromRoute(Name = "id")] string id)
         {
-            var user = await _manager.AuthService.GetOneUserForUpdateAsync(id);
+            var user = await _services.AuthService.GetOneUserForUpdateAsync(id);
             return View(user);
         }
         [HttpPost]
@@ -56,7 +56,7 @@ namespace MangaTor.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _manager.AuthService.UpdateUserAsync(userDtoForUpdate);
+                await _services.AuthService.UpdateUserAsync(userDtoForUpdate);
                 return RedirectToAction("Index");
             }
             return View();
@@ -72,7 +72,7 @@ namespace MangaTor.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _manager.AuthService.ResetPasswordAsync(resetPasswordDto);
+                await _services.AuthService.ResetPasswordAsync(resetPasswordDto);
                 return RedirectToAction("Index");
             }
             return View();
@@ -81,7 +81,7 @@ namespace MangaTor.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteOneUser([FromForm] UserDto userDto)
         {
-            await _manager.AuthService.DeleteAsync(userDto.UserName);
+            await _services.AuthService.DeleteAsync(userDto.UserName);
             return RedirectToAction("Index");
         }
     }

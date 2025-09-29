@@ -3,6 +3,7 @@ using DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Services.Contacts;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,18 +13,16 @@ namespace MangaTor.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class ChaptersController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly IServiceManager _services;
 
-        public ChaptersController(AppDbContext context)
+        public ChaptersController( IServiceManager services)
         {
-            _context = context;
+            _services = services;
         }
 
         public async Task<IActionResult> Index()
         {
-            var chapters = await _context.Chapters
-                                         .Include(c => c.Comic)
-                                         .ToListAsync();
+            var chapters = _services.ChapterService.AllChapterswithComicAsync();
             return View(chapters);
         }
 
@@ -43,22 +42,17 @@ namespace MangaTor.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] Chapter chapter)
         {
+            var slug = await _services.ChapterService.CreateAsync(chapter);
 
-            _context.Add(chapter);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Details", "Comics", new { area = "Admin", comicSlug = _context.Comics.Find(chapter.ComicId).Slug });
+            return RedirectToAction("Details", "Comics", new { area = "Admin", comicSlug = slug });
 
         }
 
         // GET: Admin/Chapters/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var chapter =  _context.Chapters.Include(m=> m.Comic).FirstOrDefault(m=>m.ChapterId==id);
+            var chapter = _services.ChapterService.FindChapterwithComicAsync(id);
             if (chapter == null)
             {
                 return NotFound();
@@ -76,42 +70,19 @@ namespace MangaTor.Areas.Admin.Controllers
                 return NotFound();
             }
 
+            var slug = await _services.ChapterService.UpdateChapterAsync(chapter);
 
-            try
-            {
-                _context.Update(chapter);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ChapterExists(chapter.ChapterId))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction("Details", "Comics", new { area = "Admin", comicSlug = _context.Comics.Find(chapter.ComicId).Slug });
+            return RedirectToAction("Details", "Comics", new { area = "Admin", comicSlug = slug });
 
         }
 
 
         public async Task<IActionResult> Delete(int id)
         {
-            var chapter = await _context.Chapters.FindAsync(id);
-            if (chapter != null)
-            {
-                _context.Chapters.Remove(chapter);
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction("Details", "Comics", new { area = "Admin", comicSlug = _context.Comics.Find(chapter.ComicId).Slug });
+            var slug = await _services.ChapterService.DeleteAsync(id);
+            return RedirectToAction("Details", "Comics", new { area = "Admin", comicSlug = slug });
         }
 
-        private bool ChapterExists(int id)
-        {
-            return _context.Chapters.Any(e => e.ChapterId == id);
-        }
+
     }
 }

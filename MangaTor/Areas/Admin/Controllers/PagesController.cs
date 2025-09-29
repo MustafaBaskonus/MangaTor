@@ -3,6 +3,7 @@ using DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Services.Contacts;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,23 +14,17 @@ namespace MangaTor.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class PagesController : Controller
     {
-        private readonly AppDbContext _context;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IServiceManager _services;
 
-        public PagesController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
+        public PagesController(IServiceManager services)
         {
-            _context = context;
-            _webHostEnvironment = webHostEnvironment;
+            _services = services;
         }
 
         // GET: Admin/Pages/Index/{chapterId}
-        // Bir bölüme ait sayfaları listeler.
         public async Task<IActionResult> Index(int chapterId)
         {
-            var chapter = await _context.Chapters
-                                        .Include(c => c.Comic)
-                                        .Include(c => c.Pages.OrderBy(p => p.PageNumber))
-                                        .FirstOrDefaultAsync(c => c.ChapterId == chapterId);
+            var chapter = await _services.ChapterService.FindChapterwithComicAndPagesAsync(chapterId);
 
             if (chapter == null)
             {
@@ -55,52 +50,15 @@ namespace MangaTor.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int chapterId, List<IFormFile> files)
         {
-            var chapter = await _context.Chapters
-                                .Include(c => c.Comic) // Bu satır çok önemli!
-                                .FirstOrDefaultAsync(c => c.ChapterId == chapterId);
+            var chapter = await _services.ChapterService.FindChapterwithComicAsync(ChapterId: chapterId);
 
             if (chapter == null || files == null || files.Count == 0)
             {
                 return RedirectToAction("Index", new { chapterId });
             }
 
-            // Çizgi romanın resimlerinin saklanacağı yolu oluşturun
-            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "comics", chapter.Comic.Slug, chapter.ChapterNo.ToString());
-
-            // Eğer klasör yoksa oluşturun
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            int pageNumber = _context.Pages.Where(p => p.ChapterId == chapterId).Count() + 1;
-
-            foreach (var file in files.OrderBy(f => f.FileName))
-            {
-                var fileName = Path.GetFileName(file.FileName);
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-                // Veritabanına sayfa bilgilerini kaydet
-                var page = new Page
-                {
-                    ChapterId = chapterId,
-                    PageNumber = pageNumber,
-                    ImageUrl = Path.Combine("/comics", chapter.Comic.Slug, chapter.ChapterNo.ToString(), fileName).Replace("\\", "/")
-                };
-                
-                _context.Pages.Add(page);
-                pageNumber++;
-            }
-
-            chapter.TotalPage = files.Count();
-            _context.Chapters.Update(chapter);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Details", "Comics", new { area = "Admin", comicSlug = chapter.Comic.Slug });
+            await _services.ChapterService.AddImagesForChapter(chapter.ChapterId , files);
+            return RedirectToAction("Details","Comics",new {area = "Admin", comicSlug = chapter.Comic.Slug });
             //return RedirectToAction("Index", new { chapterId });
         }
     }
